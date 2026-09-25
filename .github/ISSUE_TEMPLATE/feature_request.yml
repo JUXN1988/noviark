@@ -1,0 +1,14 @@
+name: Feature request / Sugerir una mejora
+description: Ideas to make Noviark better / Ideas para mejorar Noviark
+labels: [enhancement]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like? / ¿Qué te gustaría?
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why is it useful? / ¿Para qué te sirve?

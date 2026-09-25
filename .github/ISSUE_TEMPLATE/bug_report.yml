@@ -1,0 +1,33 @@
+name: Bug report / Reportar un error
+description: Something doesn't work / Algo no funciona
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened? / ¿Qué pasó?
+      description: Steps to reproduce and what you expected / Pasos para reproducirlo y qué esperabas
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: System / Sistema
+      options: [Windows 10/11, macOS Apple Silicon, macOS Intel, Ubuntu/Debian, Other / Otro]
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Noviark version / Versión
+      placeholder: "4.2.0"
+  - type: input
+    id: model
+    attributes:
+      label: Provider and model / Proveedor y modelo
+      placeholder: "nvidia::..., gemini::..., ollama::..."
+  - type: textarea
+    id: logs
+    attributes:
+      label: Error text or screenshot / Texto del error o captura
+      description: Never paste API keys / Nunca pegues tus API keys

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Noviark</title>
+<link rel="icon" type="image/png" href="/static/favicon.png">
+<link rel="stylesheet" href="/static/lib/github-dark.min.css">
+<link rel="stylesheet" href="/static/app.css">
+<script>window.TOKEN = "__TOKEN__";</script>
+<script src="/static/i18n.js"></script>
+<script src="/static/lib/marked.min.js"></script>
+<script src="/static/lib/purify.min.js"></script>
+<script src="/static/lib/highlight.min.js"></script>
+<link rel="stylesheet" href="/static/lib/cm/codemirror.bundle.css">
+<script src="/static/lib/cm/codemirror.min.js"></script>
+</head>
+<body>
+<div id="app">
+  <aside id="side">
+    <div id="brand"><img src="/static/noviq_icon.png" alt="" class="logo"><div>Noviark<br><small>agente de IA · v4.2</small></div></div>
+    <button class="sbtn primary" id="newChat">＋ Nueva conversación</button>
+    <div class="shead"><span>Proyectos</span><span><button id="allProjs" title="Ver todos los proyectos">▦</button><button id="newProj" title="Nuevo proyecto">＋</button></span></div>
+    <div id="projects"></div>
+    <div class="shead"><span id="convHead">Conversaciones</span></div>
+    <div id="convs"></div>
+    <div id="sidefoot">
+      <button class="sbtn gift" id="openGratis">🎁 IA gratis: conecta modelos sin pagar</button>
+      <div class="sgrid">
+        <button class="sbtn" id="openPc" title="Control del PC y tareas programadas">🖥 PC y tareas</button>
+        <button class="sbtn" id="openApr" title="Aprendizaje de los agentes">🧬 Aprendizaje</button>
+        <button class="sbtn" id="openMem" title="Memoria">🧠 Memoria</button>
+        <button class="sbtn" id="openMcp" title="Servidores MCP">🔌 MCP</button>
+        <button class="sbtn" id="openFolder" title="Abrir carpeta">📁 Carpeta</button>
+        <button class="sbtn" id="openCfg" title="Ajustes">⚙ Ajustes</button>
+      </div>
+      <button class="sbtn off" id="apagarBtn" title="Cierra Noviark por completo">⏻ Apagar Noviark</button>
+    </div>
+  </aside>
+  <main id="main">
+    <div id="top">
+      <button class="ib" id="menuBtn">☰</button>
+      <select class="top" id="modelSel" title="Modelo" hidden></select>
+      <div id="modelPick">
+        <button id="modelBtn" class="modelbtn" title="Elegir modelo (pasa el mouse sobre cada uno para ver para qué sirve)"><span id="modelBtnName">Modelo</span> <span class="small">▾</span></button>
+        <div id="modelPop">
+          <div class="msearch"><input id="modelSearch" type="search" name="noviq-buscar-modelo" autocomplete="off" spellcheck="false" placeholder="Buscar modelo… (ej. coder, gemini, vision)"><button id="searchClear" title="Borrar búsqueda" style="display:none">✕</button></div>
+          <div id="modelTools"><button id="vgApply" class="btn ok" title="Prueba los modelos gratuitos más inteligentes, elige el mejor que responda y pone los siguientes como respaldo">🧠 Usar siempre los más inteligentes gratis</button><button id="vgCheck" class="btn" title="Comprueba cuáles modelos responden de verdad">🩺 Verificar</button></div>
+          <div id="modelOpts"><label class="chk"><input type="checkbox" id="soloOk" checked> ✅ Solo los que funcionan</label><button id="verifNow" class="linkbtn" title="Probar ahora todos los modelos de tus proveedores">🔎 Verificar todos</button><span id="verifLine" class="small"></span></div>
+          <div id="modelMsg" class="small"></div>
+          <div id="modelRecos"></div>
+          <div id="modelList"></div>
+        </div>
+      </div>
+      <button class="ib" id="refreshModels" title="Recargar lista de modelos">↻</button>
+      <button class="chip proj" id="projChip" title="Proyecto de esta conversación">🗂 Sin proyecto</button>
+      <span class="grow"></span>
+      <select class="top" id="permSel" title="Permisos de la IA">
+        <option value="preguntar">🔒 Preguntar antes de actuar</option>
+        <option value="auto_seguro">🛡 Auto seguro (pregunta solo lo riesgoso)</option>
+        <option value="auto">⚡ Todo automático</option>
+      </select>
+      <button class="ib" id="estadoBtn" title="Estado del trabajo (lo que se hizo y lo que sigue)">📋</button>
+      <button class="ib" id="pvToggle" title="Vista previa">🗔</button>
+    </div>
+    <div id="healthBar" style="display:none"></div>
+    <div id="body">
+      <div id="chatcol">
+        <div id="msgs"><div class="wrap" id="thread"></div></div>
+        <div id="composer"><div class="wrap">
+          <div id="fase" class="fase" style="display:none"></div>
+          <div id="tasks"></div>
+          <div id="att"></div>
+          <div id="box">
+            <button class="ibtn" id="attBtn" title="Adjuntar imágenes o archivos (también puedes pegar o arrastrar)">📎</button>
+            <input type="file" id="file" multiple hidden>
+            <textarea id="inp" rows="1" placeholder="Pide lo que quieras: un programa, una imagen, revisar tu PC…  (Enter envía · Shift+Enter nueva línea)"></textarea>
+            <button id="send">Enviar</button>
+          </div>
+          <div class="hint"><span id="hint"></span> <span id="ctxMeter" title="Contexto usado en la última petición / ventana del modelo"></span></div>
+        </div></div>
+      </div>
+      <section id="preview">
+        <div id="pvSwitch"><button data-pv="files" class="on">📁 Archivos</button><button data-pv="view">👁 Vista / Editor</button><button data-pv="live" id="pvLiveBtn">✍ En vivo</button><button data-pv="plan" id="pvPlanBtn">🧠 Plan</button><span class="grow"></span><button class="ib" id="pvClose" title="Cerrar panel">✕</button></div>
+        <div id="pvFiles">
+          <div id="ftBar"><span id="ftRoot" class="small"></span><span class="grow"></span>
+            <button class="ib" id="ftNewFile" title="Nuevo archivo">＋📄</button><button class="ib" id="ftNewDir" title="Nueva carpeta">＋📁</button>
+            <button class="ib" id="ftRefresh" title="Actualizar">↻</button><button class="ib" id="ftOpen" title="Abrir en el Explorador de Windows">📂</button></div>
+          <div id="fileTree"></div>
+          <div class="small" style="padding:6px 10px">Arrastra archivos a otra carpeta para moverlos · clic derecho para más opciones · doble clic para abrir</div>
+        </div>
+        <div id="pvLive" style="display:none"><div id="liveHead" class="small">Aquí verás en vivo lo que la IA va escribiendo en los archivos.</div><pre id="liveBody"></pre></div>
+        <div id="pvPlan" style="display:none"><div id="planBody" class="md"><div class="small">Aquí verás el plan mientras la IA lo diseña, y podrás editarlo antes de aprobarlo.</div></div></div>
+        <div id="pvView" style="display:none">
+          <div id="pvHead"><span id="pvName">Vista previa</span>
+            <button class="ib" id="pvEdit" title="Editar">✏ Editar</button>
+            <button class="ib" id="pvSave" title="Guardar (Ctrl+S)" style="display:none">💾 Guardar</button>
+            <button class="ib" id="pvReload" title="Recargar">↻</button>
+            <button class="ib" id="pvExt" title="Abrir en pestaña nueva">↗</button>
+            <button class="ib" id="pvFolder" title="Mostrar en carpeta">📂</button></div>
+          <div id="pvTabs"></div>
+          <div id="pvBody"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<!-- Ajustes -->
+<div class="modal" id="cfgModal"><div class="card">
+  <div class="cfghead"><h2>⚙ Ajustes</h2><label class="langsel">🌐 <select id="langSel" data-noi18n><option value="auto">Auto / Automático</option><option value="es">Español</option><option value="en">English</option></select></label></div>
+  <div class="tabs" data-tabs="cfg">
+    <button data-tab="t-prov" class="on">Proveedores y claves</button><button data-tab="t-fb">Respaldo</button><button data-tab="t-gen">Modelo y respuestas</button><button data-tab="t-agents">Agentes</button><button data-tab="t-local">IA local</button>
+    <button data-tab="t-tools">Herramientas</button><button data-tab="t-adv">Avanzado</button>
+  </div>
+  <div class="tabpane on" id="t-prov">
+    <div class="small">🔐 Tus API keys se guardan en una bóveda cifrada (<span id="vaultInfo"></span>), nunca en texto plano. Puedes poner varias claves por proveedor (una por línea): si una llega al límite, se usa la siguiente.</div>
+    <div id="provList"></div>
+    <button class="btn" id="addProv">＋ Agregar otro proveedor compatible con OpenAI</button>
+  </div>
+  <div class="tabpane" id="t-fb">
+    <label class="chk"><input type="checkbox" id="fb-on"> Si una IA falla o no responde, continuar automáticamente con la siguiente (sin perder el contexto)</label>
+    <div class="small">Orden de respaldo (después del modelo elegido arriba). La IA que toma el relevo recibe todo el historial, la lista de tareas, el registro de acciones y la memoria del proyecto.</div>
+    <div id="fbList" style="margin:8px 0"></div>
+    <div class="row"><div style="flex:3"><select id="fbAdd"></select></div><div style="flex:1"><button class="btn" id="fbAddBtn" style="width:100%">＋ Agregar</button></div></div>
+    <label>Segundos sin respuesta para considerar que una IA "no responde"</label><input id="fb-timeout" type="number" min="30" max="1800">
+    <h3 style="margin-top:18px">🚀 Escalado inteligente</h3>
+    <label class="chk"><input type="checkbox" id="esc-on"> Si la IA se atasca (bucles, errores repetidos, razonamiento eterno), pasar el trabajo a la IA más capaz que tengas habilitada y con cuota</label>
+    <label class="chk"><input type="checkbox" id="esc-pago"> Permitir escalar a modelos de pago (si tienes su clave)</label>
+    <label class="chk"><input type="checkbox" id="dg-auto"> Diagnóstico automático cuando digo que algo no funciona (errores reales, navegador de pruebas)</label>
+    <h3 style="margin-top:18px">🛡 Guardián de razonamiento</h3>
+    <label class="chk"><input type="checkbox" id="gd-on"> Cortar el razonamiento eterno y los bucles de texto repetido (la IA recibe la orden de actuar ya)</label>
+    <div class="row">
+      <div><label>Máx. caracteres pensando sin actuar</label><input id="gd-chars" type="number" min="3000" max="200000" step="1000"></div>
+      <div><label>Máx. segundos pensando sin actuar</label><input id="gd-secs" type="number" min="30" max="1800" step="10"></div>
+    </div>
+    <div class="small">Con IA local el límite se reduce automáticamente (40 % menos).</div>
+  </div>
+  <div class="tabpane" id="t-gen">
+    <div class="row">
+      <div><label>Temperatura</label><input id="c-temp" type="number" step="0.1" min="0" max="2"></div>
+      <div><label>Máx. tokens por respuesta</label><input id="c-max" type="number" step="512" min="256"></div>
+      <div><label>Razonamiento</label><select id="c-reason"><option value="">Por defecto</option><option value="low">Bajo (rápido)</option><option value="medium">Medio</option><option value="high">Alto</option><option value="max">Máximo</option></select></div>
+    </div>
+    <label>Modelo de imágenes (NVIDIA)</label>
+    <input id="c-img" list="imgModels"><datalist id="imgModels">
+      <option value="black-forest-labs/flux.1-schnell"><option value="black-forest-labs/flux.1-dev">
+    </datalist>
+    <div class="small">flux.1-schnell = rápido · flux.1-dev = más calidad. Puedes escribir otro ID de build.nvidia.com.</div>
+    <label>Instrucciones personales para la IA (se aplican siempre)</label>
+    <textarea id="c-sys" rows="4" placeholder="Ej: Soy técnico de cajeros automáticos en Ecuador. Explícame con ejemplos prácticos."></textarea>
+  </div>
+  <div class="tabpane" id="t-agents">
+    <label>🤖 Agente ejecutor de código (cuando la IA escribe código en el chat en vez de usar herramientas)</label>
+    <select id="a-ejec"><option value="auto">Automático (guarda archivos; ejecuta comandos solo con IAs sin herramientas)</option>
+      <option value="siempre">Siempre (guarda y ejecuta lo que la IA escriba)</option><option value="nunca">Nunca</option></select>
+    <label>👁 Modelo para analizar imágenes cuando la IA principal no tiene visión (vacío = elegir automáticamente)</label>
+    <input id="a-vision" list="allModels" placeholder="automático">
+    <label>🧩 Modelo para subagentes: navegador y equipo (vacío = automático, se prefieren modelos con herramientas nativas)</label>
+    <input id="a-aux" list="allModels" placeholder="automático">
+    <label>👥 Agentes trabajando en paralelo en el equipo (1-4)</label><input id="a-team" type="number" min="1" max="4">
+    <label class="chk"><input type="checkbox" id="a-navdir"> Dar a la IA principal todas las herramientas del navegador (gasta más tokens; por defecto se delega al agente navegador)</label>
+    <datalist id="allModels"></datalist>
+  </div>
+  <div class="tabpane" id="t-local">
+    <div class="small">Optimiza Ollama y LM Studio para tu equipo. Noviark calcula el contexto ideal según la VRAM, la RAM y el tamaño de cada modelo, y hace que la IA trabaje paso a paso para que no pierda el hilo.</div>
+    <div class="row">
+      <div><label>VRAM de tu tarjeta (GB)</label><input id="l-vram" type="number" min="2" max="192"></div>
+      <div><label>RAM del sistema (GB)</label><input id="l-ram" type="number" min="4" max="1024"></div>
+      <div><label>Contexto máximo (tokens)</label><select id="l-maxctx"><option>8192</option><option>16384</option><option>24576</option><option>32768</option><option>49152</option><option>65536</option></select></div>
+    </div>
+    <div class="row">
+      <div><label>Contexto fijo (0 = automático)</label><input id="l-numctx" type="number" min="0" step="1024"></div>
+      <div><label>Modo compacto paso a paso</label><select id="l-compact"><option value="auto">Automático (IA local)</option><option value="siempre">Siempre</option><option value="nunca">Nunca</option></select></div>
+      <div><label>Razonamiento (modelos que piensan)</label><select id="l-think"><option value="auto">Lo decide el modelo</option><option value="no">Desactivado (más rápido)</option></select></div>
+    </div>
+    <label>Pasos máximos en modo local</label><input id="l-steps" type="number" min="20" max="500">
+    <label class="chk"><input type="checkbox" id="l-native"> Usar la API nativa de Ollama (recomendado: permite fijar el contexto; si no, Ollama usa solo 4096 tokens)</label>
+    <label class="chk"><input type="checkbox" id="l-tests"> 🧪 Agente de pruebas automático (revisa el código tras cada cambio y al terminar)</label>
+    <div class="btns" style="margin-top:12px"><button class="btn ok" id="l-opt">⚡ Optimizar Ollama para mi GPU</button></div>
+    <div class="small" id="l-optout" style="white-space:pre-wrap;margin-top:6px"></div>
+    <div class="small" style="margin-top:8px">Con 16 GB de VRAM y 32 GB de RAM te recomendamos: <b>qwen3-coder:30b</b> (el mejor para programar en local), <b>gpt-oss:20b</b> o <b>devstral</b> como alternativas, y <b>qwen3-vl:4b</b> como ayudante de visión.</div>
+  </div>
+  <div class="tabpane" id="t-tools">
+    <label>Modo de herramientas</label>
+    <select id="c-toolmode">
+      <option value="auto">Automático (nativo y, si el modelo no lo soporta, por texto)</option>
+      <option value="nativo">Nativo (function calling)</option>
+      <option value="texto">Por texto (funciona con cualquier modelo)</option>
+      <option value="ninguno">Sin herramientas (solo chat)</option>
+    </select>
+    <label>Máximo de pasos autónomos por mensaje</label><input id="c-steps" type="number" min="1" max="200">
+    <label>Carpeta de proyectos (vacío = Documentos\Noviq_Proyectos)</label><input id="c-projdir">
+    <div class="small" id="c-projroot"></div>
+    <label>Herramientas disponibles</label><div id="toolList" class="small" style="max-height:220px;overflow:auto"></div>
+  </div>
+  <div class="tabpane" id="t-adv">
+    <p class="small">El programa recuerda, por modelo, si acepta herramientas nativas, mensajes de sistema, etc. Si cambiaste de versión de un modelo, reinicia esa memoria:</p>
+    <div class="btns"><button class="btn ok" id="diagBtn">🩺 Probar el modelo seleccionado</button>
+      <button class="btn" id="logBtn">📄 Ver registro técnico</button>
+      <button class="btn" id="resetOv">Reiniciar compatibilidad aprendida</button></div>
+    <div id="diagOut" class="small" style="margin-top:10px;white-space:pre-wrap"></div>
+    <div class="small" id="ovList" style="margin-top:8px"></div>
+    <pre id="logOut" style="display:none;max-height:300px;overflow:auto;font:11.5px Consolas,monospace;background:var(--code);padding:8px;border-radius:8px;white-space:pre-wrap"></pre>
+  </div>
+  <div class="foot"><button class="btn" data-close>Cancelar</button><button class="btn ok" id="cfgSave">Guardar</button></div>
+</div></div>
+
+<!-- Nuevo proyecto -->
+<div class="modal" id="projModal"><div class="card">
+  <h2>🗂 Nuevo proyecto</h2>
+  <div class="small">Se crea una carpeta propia en tu carpeta de proyectos (con PowerShell en Windows).</div>
+  <div class="row"><div><label>Nombre</label><input id="np-name" placeholder="Mi_App"></div>
+  <div><label>Tipo</label><select id="np-tipo"></select></div></div>
+  <label>Descripción</label><input id="np-desc" placeholder="Qué es el proyecto">
+  <label>Instrucciones para la IA en este proyecto (opcional)</label>
+  <textarea id="np-inst" rows="4" placeholder="Ej: usa Python 3.12 y Tkinter, comenta el código en español"></textarea>
+  <div class="foot"><button class="btn" data-close>Cancelar</button><button class="btn ok" id="np-ok">Crear</button></div>
+</div></div>
+
+<!-- Editar proyecto -->
+<div class="modal" id="projEdit"><div class="card">
+  <h2 id="pe-title">Proyecto</h2>
+  <label>Descripción</label><input id="pe-desc">
+  <label>Instrucciones para la IA en este proyecto</label><textarea id="pe-inst" rows="6"></textarea>
+  <div class="foot"><button class="btn" id="pe-open">📁 Abrir carpeta</button><span class="grow"></span><button class="btn" data-close>Cancelar</button><button class="btn ok" id="pe-ok">Guardar</button></div>
+</div></div>
+
+<!-- Proyectos -->
+<div class="modal full" id="projsModal"><div class="card wide">
+  <div class="fullhead"><h2>🗂 Proyectos</h2><span id="pjStats" class="small"></span><span class="grow"></span><button class="btn" data-close>✕ Cerrar</button></div>
+  <div id="projsBar">
+    <input id="pjSearch" placeholder="Buscar por nombre, tipo o carpeta…">
+    <select id="pjSort"><option value="recientes">Más recientes</option><option value="nombre">Nombre A-Z</option><option value="tipo">Tipo</option></select>
+    <select id="pjFilter"><option value="">Todos</option><option value="propios">Creados en Noviark</option><option value="externos">Existentes en mi PC</option><option value="trabajando">Trabajando ahora</option></select>
+    <select id="pjView"><option value="grid">▦ Tarjetas</option><option value="list">☰ Lista</option></select>
+    <button class="btn" id="pjImport">📂 Abrir proyecto existente</button>
+    <button class="btn ok" id="pjNew">＋ Nuevo proyecto</button>
+  </div>
+  <div id="projGrid"></div>
+</div></div>
+
+<!-- Importar proyecto existente -->
+<div class="modal" id="importModal"><div class="card">
+  <h2>📂 Abrir un proyecto que ya tienes</h2>
+  <div class="small">Elige la carpeta raíz del proyecto. Noviark detecta su tipo y la IA podrá leerlo, revisarlo, probarlo y corregirlo como si lo hubiera creado aquí. Tus archivos no se mueven.</div>
+  <label>Carpeta raíz</label>
+  <div class="row"><div style="flex:4"><input id="imPath" placeholder="C:\Users\tu_usuario\Proyectos\mi_app"></div>
+    <div style="flex:1"><button class="btn" id="imPick" style="width:100%">Elegir…</button></div></div>
+  <label>Nombre en Noviark (opcional)</label><input id="imName" placeholder="(el nombre de la carpeta)">
+  <div class="small" id="imOut" style="margin-top:8px"></div>
+  <div class="foot"><button class="btn" data-close>Cancelar</button><button class="btn ok" id="imOk">Abrir proyecto</button></div>
+</div></div>
+
+<!-- IA gratis -->
+<div class="modal" id="gratisModal"><div class="card wide">
+  <h2>🎁 IA gratis</h2>
+  <div class="small">Estos proveedores dan acceso <b>gratis y legal</b> a modelos potentes con su plan gratuito oficial. Crea la cuenta en su web (1 minuto, casi todos sin tarjeta), pega la clave y listo: Noviark la guarda cifrada y la prueba. Si activas varios, cuando uno llega a su límite diario el <b>respaldo automático</b> continúa con otro sin perder el trabajo.</div>
+  <div class="vgbox">
+    <h3>🧠 Modo vanguardia</h3>
+    <div class="small">Noviark usa siempre los modelos <b>gratuitos más inteligentes</b> (los que más razonan) que tengas conectados. Antes de construir un programa, el <b>cerebro</b> (el más inteligente) diseña el plan completo con razonamiento alto y luego la IA de trabajo lo ejecuta paso a paso. Si uno falla o se agota, sigue el siguiente sin perder nada.</div>
+    <div class="row2"><button class="btn ok" id="vgApply2">🧠 Elegir y probar los mejores ahora</button>
+      <label class="chk"><input type="checkbox" id="vgPlan"> El cerebro planifica antes de construir</label>
+      <label class="chk"><input type="checkbox" id="vgAuto"> Respaldo automático con los mejores gratis</label></div>
+    <div class="row2"><span class="small">Cerebro:</span><select id="vgBrain"></select></div>
+    <div id="vgOut" class="small"></div>
+  </div>
+  <div id="gratisGrid"></div>
+  <div class="small" style="margin-top:8px">Los límites gratuitos los fija cada proveedor y pueden cambiar. Noviark no usa las webs de chat de pago (ChatGPT, Claude.ai…) porque va contra sus condiciones y podrían bloquear tus cuentas.</div>
+  <div class="foot"><button class="btn" data-close>Cerrar</button></div>
+</div></div>
+
+<!-- PC y tareas programadas -->
+<div class="modal" id="pcModal"><div class="card wide">
+  <h2>🖥 Control del PC y tareas programadas</h2>
+  <div class="pcgrid">
+    <div class="gcard">
+      <h3>🖱 Control del PC</h3>
+      <div class="gt">La IA puede abrir programas, hacer clic, escribir y usar atajos en tu escritorio con el <b>mismo método que usa en el navegador</b>: lee la ventana (cada botón/campo tiene una referencia), actúa y verifica. Pídeselo en el chat, ej.: «abre Excel y crea una tabla de gastos». Por seguridad te pide permiso antes de actuar (salvo en ⚡ Todo automático).</div>
+      <div id="pcState" class="small"></div>
+      <div class="row2"><button class="btn" id="pcTest">🩺 Probar control integrado</button><button class="btn ok" id="pcMcp">⬆ Activar Windows-MCP (más completo)</button></div>
+      <div id="pcOut" class="small"></div>
+      <label class="chk"><input type="checkbox" id="pcStartup"> Iniciar Noviark con Windows (para que las tareas programadas siempre se ejecuten)</label>
+    </div>
+    <div class="gcard">
+      <h3>⏰ Nueva tarea programada</h3>
+      <input id="tpName" placeholder="Nombre (ej. Informe diario de ventas)">
+      <textarea id="tpText" rows="3" placeholder="Qué debe hacer la IA (ej. Revisa la carpeta Descargas y ordénala por tipo; luego hazme un resumen)"></textarea>
+      <div class="row2"><select id="tpTipo"><option value="diario">Cada día / ciertos días</option><option value="una_vez">Una sola vez</option><option value="intervalo">Cada N minutos</option></select>
+        <input id="tpHora" type="time" value="08:00"><input id="tpFecha" type="datetime-local" style="display:none"><input id="tpCada" type="number" min="5" value="60" style="display:none;width:90px"></div>
+      <div class="row2" id="tpDias"></div>
+      <div class="row2"><select id="tpProj"></select><label class="chk"><input type="checkbox" id="tpAuto" checked> Sin pedir permisos</label></div>
+      <button class="btn ok" id="tpSave">＋ Programar</button><div id="tpOut" class="small"></div>
+    </div>
+  </div>
+  <h3 style="margin:14px 0 6px">Tareas programadas</h3>
+  <div id="tpList"></div>
+  <div class="foot"><button class="btn" data-close>Cerrar</button></div>
+</div></div>
+
+<!-- Aprendizaje -->
+<div class="modal" id="aprModal"><div class="card wide">
+  <h2>🧬 Aprendizaje de los agentes</h2>
+  <div class="small">Los agentes de Noviark aprenden solos: cuando algo falla y luego la IA lo arregla, se guarda <b>qué error era y qué lo solucionó</b>. La próxima vez que aparezca ese error (en cualquier proyecto y con cualquier IA) Noviark le pasa la solución que ya funcionó. También aprende qué paquete instalar para cada módulo y qué modelos no están operativos.</div>
+  <div class="row2" style="margin:10px 0"><label class="chk"><input type="checkbox" id="aprOn"> Aprendizaje activo</label><span id="aprStats" class="small"></span><span class="grow"></span><button class="btn" id="aprClear">🗑 Olvidar todo lo aprendido</button></div>
+  <div id="aprHealth"></div>
+  <div id="aprList"></div>
+  <div class="foot"><button class="btn" data-close>Cerrar</button></div>
+</div></div>
+
+<!-- Memoria -->
+<div class="modal" id="memModal"><div class="card">
+  <h2>🧠 Memoria</h2>
+  <div class="small">Lo que la IA recuerda de ti entre conversaciones. Puedes editarlo.</div>
+  <textarea id="memText" rows="16"></textarea>
+  <div class="foot"><button class="btn" data-close>Cancelar</button><button class="btn ok" id="memSave">Guardar</button></div>
+</div></div>
+
+<!-- MCP -->
+<div class="modal" id="mcpModal"><div class="card">
+  <h2>🔌 Servidores MCP</h2>
+  <div class="small">Mismo formato que Claude Desktop (<code>claude_desktop_config.json</code>). Cada servidor añade herramientas nuevas a la IA. Pon <code>"disabled": true</code> para desactivar uno.</div>
+  <div class="prov"><h3>🌐 Control del navegador</h3>
+    <div class="small">Permite que la IA abra páginas, haga clic, llene formularios y lea datos en Chrome o Edge (Playwright MCP).</div>
+    <div class="btns"><button class="btn ok" id="presetChrome">Activar Google Chrome</button><button class="btn ok" id="presetEdge">Activar Microsoft Edge</button></div>
+    <div class="small" id="mcpSys" style="margin-top:6px"></div></div>
+  <div id="mcpStatus" style="margin:10px 0"></div>
+  <textarea id="mcpText" rows="16" spellcheck="false"></textarea>
+  <div class="foot"><button class="btn" data-close>Cerrar</button><button class="btn ok" id="mcpSave">Guardar y reiniciar servidores</button></div>
+</div></div>
+
+<div id="lightbox"><img alt=""></div>
+<div id="modelBubble"></div>
+<div id="ctxMenu"></div>
+<div id="drop">Suelta aquí imágenes o archivos</div>
+<script src="/static/app.js"></script>
+<div id="toasts"></div>
+</body>
+</html>

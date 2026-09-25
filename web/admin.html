@@ -1,0 +1,65 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Estadísticas | Noviark Labs</title><meta name="robots" content="noindex, nofollow"><link rel="icon" href="/img/favicon.png">
+<link rel="stylesheet" href="/css/styles.css">
+<style>
+.wrap{max-width:1180px;margin:0 auto;padding:30px 16px 60px}
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:22px}.top h1{font-size:28px;margin:0;flex:1}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}.kpi b{display:block;font-size:32px;color:var(--g2)}.kpi span{color:var(--muted);font-size:13.5px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px}
+.panel h3{margin:0 0 12px;font-size:16px}.cols{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+table{width:100%;border-collapse:collapse;font-size:14px}td{padding:6px 4px;border-bottom:1px solid #ffffff0b}td:last-child{text-align:right;font-weight:700}
+.bar{height:6px;background:#3fdc2b33;border-radius:4px;margin-top:3px}.bar i{display:block;height:100%;background:var(--g1);border-radius:4px}
+#login{max-width:420px;margin:12vh auto;text-align:center}#login input{width:100%;margin:14px 0;background:#0a1016;border:1px solid var(--line);color:var(--text);border-radius:10px;padding:12px;font:inherit}
+.err{color:#ff8080}.leg{display:flex;gap:16px;font-size:13px;color:var(--muted)}.leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px}
+@media(max-width:900px){.kpis{grid-template-columns:1fr 1fr}.cols{grid-template-columns:1fr}}
+</style></head><body>
+<div id="login" class="panel"><img src="/img/logo.png" width="56" height="56" alt="" style="margin:0 auto;border-radius:12px"><h2>Panel privado</h2>
+<p class="small">Introduce la clave de administrador (la variable NOVIARK_ADMIN_KEY de Netlify).</p>
+<input id="k" type="password" placeholder="Clave de administrador" autocomplete="current-password"><button class="btn primary" id="go" style="width:100%">Entrar</button><p id="e" class="err"></p></div>
+<div class="wrap" id="app" hidden>
+  <div class="top"><h1>📊 Noviark Labs · Estadísticas</h1><span class="small" id="upd"></span><button class="btn ghost sm" id="re">Actualizar</button><button class="btn ghost sm" id="out">Salir</button></div>
+  <div class="kpis">
+    <div class="kpi"><b id="kV">0</b><span>Visitas únicas (por sesión)</span></div>
+    <div class="kpi"><b id="kD">0</b><span>Clics de descarga en la web</span></div>
+    <div class="kpi"><b id="kG">—</b><span>Descargas reales (GitHub)</span></div>
+    <div class="kpi"><b id="kL">0</b><span>Contactos (formulario)</span></div>
+    <div class="kpi"><b id="kC">0 %</b><span>Conversión visita → descarga</span></div>
+  </div>
+  <div class="panel"><h3>Últimos 30 días</h3><div class="leg"><span><i style="background:#3fdc2b55"></i>Visitas</span><span><i style="background:#8aff45"></i>Descargas</span><span><i style="background:#d98a5e"></i>Contactos</span></div><div id="chart"></div></div>
+  <div class="cols">
+    <div class="panel"><h3>Descargas por sistema</h3><div id="tOs"></div></div>
+    <div class="panel"><h3>Visitas por país</h3><div id="tCountry"></div></div>
+    <div class="panel"><h3>Idioma del visitante</h3><div id="tLang"></div></div>
+    <div class="panel"><h3>De dónde llegan</h3><div id="tRef"></div></div>
+    <div class="panel"><h3>Archivos (clics web)</h3><div id="tAsset"></div></div>
+    <div class="panel"><h3>Releases en GitHub</h3><div id="tGh"></div></div>
+  </div>
+  <p class="small">Los mensajes del formulario (demos, licencias, inversión, adquisición) están en Netlify → tu sitio → <b>Forms</b>. Activa ahí el aviso por correo.</p>
+</div>
+<script>
+const $=s=>document.querySelector(s);let KEY="";try{KEY=sessionStorage.getItem("nk")||""}catch(e){}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt=n=>new Intl.NumberFormat("es-ES").format(n||0);
+function table(el,obj,limit=12){const e=Object.entries(obj||{}).sort((a,b)=>b[1]-a[1]).slice(0,limit);const max=e.length?e[0][1]:1;
+ $(el).innerHTML=e.length?"<table>"+e.map(([k,v])=>`<tr><td>${esc(k)}<div class="bar"><i style="width:${Math.round(v/max*100)}%"></i></div></td><td>${fmt(v)}</td></tr>`).join("")+"</table>":'<p class="small">Sin datos todavía.</p>'}
+function chart(days){const map={};days.forEach(d=>map[d.day]=d);const out=[];for(let i=29;i>=0;i--){const d=new Date(Date.now()-i*864e5).toISOString().slice(0,10);out.push({day:d,...(map[d]||{})})}
+ const W=1100,H=220,max=Math.max(1,...out.map(d=>d.visit||0)),bw=W/30;let s=`<svg viewBox="0 0 ${W} ${H+24}" width="100%" role="img" aria-label="Gráfico de 30 días">`;
+ out.forEach((d,i)=>{const x=i*bw+4,w=bw-8,hv=(d.visit||0)/max*H,hd=(d.download||0)/max*H,hl=(d.lead||0)/max*H;
+  s+=`<rect x="${x}" y="${H-hv}" width="${w}" height="${hv}" rx="3" fill="#3fdc2b55"><title>${d.day}: ${d.visit||0} visitas, ${d.download||0} descargas, ${d.lead||0} contactos</title></rect>`;
+  s+=`<rect x="${x+w*.2}" y="${H-hd}" width="${w*.35}" height="${hd}" rx="2" fill="#8aff45"/><rect x="${x+w*.6}" y="${H-hl}" width="${w*.25}" height="${hl}" rx="2" fill="#d98a5e"/>`;
+  if(i%5===0)s+=`<text x="${x}" y="${H+18}" fill="#93a4a0" font-size="12">${d.day.slice(5)}</text>`});$("#chart").innerHTML=s+"</svg>"}
+async function load(){$("#e").textContent="";
+ const r=await fetch("/api/stats",{headers:{"x-admin-key":KEY}}).catch(()=>null);
+ if(!r||!r.ok){const j=r?await r.json().catch(()=>({})):{};$("#e").textContent=j.error||"No se pudo conectar";$("#login").hidden=false;$("#app").hidden=true;return}
+ try{sessionStorage.setItem("nk",KEY)}catch(e){}
+ const {totals:t,days,github:g}=await r.json();$("#login").hidden=true;$("#app").hidden=false;
+ $("#kV").textContent=fmt(t.visit);$("#kD").textContent=fmt(t.download);$("#kL").textContent=fmt(t.lead);
+ $("#kG").textContent=g?fmt(g.total):"—";$("#kC").textContent=(t.visit?Math.round((t.download||0)/t.visit*1000)/10:0)+" %";
+ $("#upd").textContent=t.updated?"Último evento: "+new Date(t.updated).toLocaleString("es-ES"):"";
+ chart(days||[]);table("#tOs",t.download_os);table("#tCountry",t.country);table("#tLang",t.lang);table("#tRef",t.ref);table("#tAsset",t.download_asset);
+ $("#tGh").innerHTML=g&&g.releases.length?"<table>"+g.releases.map(x=>`<tr><td>${esc(x.tag)}<div class="small">${x.assets.map(a=>esc(a.name)+": "+a.downloads).join(" · ")}</div></td><td>${fmt(x.downloads)}</td></tr>`).join("")+"</table>":'<p class="small">Sin releases (o falta NOVIARK_REPO en Netlify).</p>'}
+$("#go").onclick=()=>{KEY=$("#k").value.trim();load()};$("#k").onkeydown=e=>{if(e.key==="Enter")$("#go").click()};
+$("#re").onclick=load;$("#out").onclick=()=>{try{sessionStorage.removeItem("nk")}catch(e){}KEY="";location.reload()};
+if(KEY)load();
+</script></body></html>

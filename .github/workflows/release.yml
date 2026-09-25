@@ -1,0 +1,89 @@
+# Compila Noviark para Windows, Linux y macOS (Apple Silicon e Intel) en los servidores de GitHub y publica los instaladores.
+# Se ejecuta al subir una etiqueta (ej.: git tag v4.2.0 && git push --tags) o a mano desde la pestaña Actions.
+name: Build and release
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    name: Build (${{ matrix.name }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            name: windows
+          - os: ubuntu-22.04
+            name: linux
+          - os: macos-14
+            name: macos-arm64
+          - os: macos-15-intel
+            name: macos-intel
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: System packages (Linux)
+        if: matrix.name == 'linux'
+        run: sudo apt-get update && sudo apt-get install -y python3-tk dpkg
+      - name: Inno Setup (Windows)
+        if: matrix.name == 'windows'
+        run: choco install innosetup -y --no-progress
+        shell: pwsh
+      - name: Build (Windows)
+        if: matrix.name == 'windows'
+        run: packaging\windows\build.bat
+        shell: cmd
+      - name: Build (Linux)
+        if: matrix.name == 'linux'
+        run: bash packaging/linux/build.sh
+      - name: Build (macOS)
+        if: startsWith(matrix.name, 'macos')
+        run: bash packaging/macos/build.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: noviark-${{ matrix.name }}
+          path: |
+            dist/Noviark-Setup-Windows.exe
+            dist/Noviark-Windows-portable.zip
+            dist/Noviark-Linux-*.deb
+            dist/Noviark-Linux-*.tar.gz
+            dist/Noviark-macOS-*.dmg
+          if-no-files-found: error
+  release:
+    needs: build
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: out
+          merge-multiple: true
+      - name: Checksums
+        run: cd out && ls -lh && sha256sum * > SHA256SUMS.txt && cat SHA256SUMS.txt
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_type == 'tag' && github.ref_name || 'v4.2.0' }}
+          name: Noviark ${{ github.ref_type == 'tag' && github.ref_name || 'v4.2.0' }}
+          body: |
+            ## ⬇ Download / Descargar
+            | System / Sistema | File / Archivo |
+            |---|---|
+            | **Windows 10/11** | `Noviark-Setup-Windows.exe` (installer / instalador) · `Noviark-Windows-portable.zip` |
+            | **macOS Apple Silicon** (M1–M4) | `Noviark-macOS-arm64.dmg` |
+            | **macOS Intel** | `Noviark-macOS-x86_64.dmg` |
+            | **Ubuntu / Debian** | `Noviark-Linux-amd64.deb` → `sudo apt install ./Noviark-Linux-amd64.deb` · other distros / otras: `Noviark-Linux-x86_64.tar.gz` |
+
+            **First launch / Primera vez**
+            - Windows: SmartScreen → *More info → Run anyway* / *Más información → Ejecutar de todas formas*.
+            - macOS: right-click Noviark → *Open* / clic derecho → *Abrir*.
+            - Linux: open **Noviark** from the apps menu or run `noviark`.
+
+            What's new / Novedades: see [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md). Checksums: `SHA256SUMS.txt`.
+          files: out/*
+          make_latest: true

@@ -1,0 +1,16 @@
+[Desktop Entry]
+Type=Application
+Name=Noviark
+GenericName=Agente de IA para programar
+Comment=Crea, prueba y corrige programas con IA gratis o local
+Exec=/opt/noviark/Noviark
+Icon=noviark
+Terminal=false
+Categories=Development;IDE;Utility;
+Keywords=IA;AI;agente;programar;ollama;nvidia;
+StartupNotify=true
+Actions=Detener;
+
+[Desktop Action Detener]
+Name=Apagar Noviark
+Exec=/opt/noviark/Noviark --stop

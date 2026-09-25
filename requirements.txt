@@ -1,0 +1,9 @@
+flask>=3.0
+requests>=2.31
+pillow>=10.0
+pypdf>=4.0
+python-docx>=1.1
+openpyxl>=3.1
+pyflakes>=3.0
+pystray>=0.19
+pywebview>=5.0; sys_platform == "win32" or sys_platform == "darwin"

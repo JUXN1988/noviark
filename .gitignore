@@ -1,0 +1,15 @@
+datos/
+build/
+dist/
+.build-venv/
+.venv/
+__pycache__/
+*.pyc
+.noviq/
+node_modules/
+.netlify/
+*.log
+.DS_Store
+.noviq.json
+*.vault
+.env

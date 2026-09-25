@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1000" viewBox="0 0 1000 1000">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="0.8" y2="1"><stop offset="0" stop-color="#202934"/><stop offset="0.55" stop-color="#121920"/><stop offset="1" stop-color="#05090d"/></linearGradient>
+  <linearGradient id="green" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d8ffb2"/><stop offset="0.25" stop-color="#63ff35"/><stop offset="0.75" stop-color="#19d92d"/><stop offset="1" stop-color="#8aff45"/></linearGradient>
+  <linearGradient id="brain" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd8bd"/><stop offset="0.28" stop-color="#a95735"/><stop offset="0.72" stop-color="#542619"/><stop offset="1" stop-color="#c26a42"/></linearGradient>
+  <linearGradient id="white" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#c9f9ff"/></linearGradient>
+  <filter id="greenGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="10" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="shadow" x="-30%" y="-30%" width="160%" height="180%"><feDropShadow dx="0" dy="18" stdDeviation="16" flood-color="#000" flood-opacity=".65"/></filter>
+</defs>
+
+<!-- scalable background -->
+<rect width="1000" height="1000" rx="40" fill="url(#bg)"/>
+<ellipse cx="500" cy="775" rx="330" ry="42" fill="#000" opacity=".55" filter="url(#softGlow)"/>
+
+<!-- geometric N -->
+<g fill="none" stroke="url(#green)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" filter="url(#greenGlow)">
+  <path d="M170 720 L170 235 L350 110 L525 330 L525 250 L675 125 L835 125 L835 720 L665 790 L500 610 L500 700 L350 850 Z"/>
+  <path d="M170 235 L350 210 L525 330 L350 390 L170 235"/>
+  <path d="M170 720 L350 625 L350 850 L170 720"/>
+  <path d="M350 110 L350 390 L170 720"/>
+  <path d="M350 210 L350 110 L525 330"/>
+  <path d="M675 125 L675 405 L835 720"/>
+  <path d="M835 125 L675 285 L835 455"/>
+  <path d="M835 720 L665 790 L500 610 L675 560 L835 720"/>
+  <path d="M500 610 L500 700 L350 850"/>
+  <path d="M675 560 L675 790"/>
+  <path d="M525 330 L675 285"/>
+</g>
+
+<!-- subtle N inner facets -->
+<g fill="none" stroke="#adff6a" stroke-width="4" opacity=".9">
+  <path d="M195 250 L335 135 L335 198"/><path d="M190 690 L330 640"/>
+  <path d="M690 145 L810 145 L690 260"/><path d="M690 575 L805 690"/>
+  <path d="M525 355 L650 300"/><path d="M365 415 L500 350"/>
+</g>
+
+<!-- brain -->
+<g filter="url(#shadow)">
+  <path d="M315 405 C285 365 305 315 355 300 C365 250 425 225 470 252 C510 215 580 232 598 280 C650 278 688 318 675 365 C718 390 710 450 675 475 C684 530 635 570 590 562 C565 600 510 605 478 575 C435 600 382 582 375 540 C325 535 298 495 318 458 C287 438 288 420 315 405 Z" fill="#1a1717" stroke="url(#brain)" stroke-width="16" stroke-linejoin="round"/>
+  <path d="M336 405 C319 370 338 332 375 326 C383 285 430 270 466 293 C504 255 558 270 572 312 C622 303 656 336 646 375 C682 397 676 438 646 457 C656 501 617 532 582 520 C558 558 515 560 488 535 C452 562 409 548 405 510 C365 510 340 482 355 449 C327 437 320 420 336 405 Z" fill="#5b2b1d" opacity=".95"/>
+  <!-- brain grooves -->
+  <g fill="none" stroke="#e28b5e" stroke-width="8" stroke-linecap="round">
+    <path d="M370 338 C390 320 410 324 420 347 C428 365 414 378 399 389 C384 401 388 418 408 425"/>
+    <path d="M468 294 C445 315 450 338 470 350 C489 361 489 379 470 393"/>
+    <path d="M545 300 C520 320 526 340 545 353 C562 364 559 386 541 398"/>
+    <path d="M610 335 C580 350 586 375 606 389 C622 401 615 421 598 429"/>
+    <path d="M356 449 C382 432 401 443 405 463 C409 483 394 493 376 497"/>
+    <path d="M455 404 C430 424 438 448 458 457 C476 465 475 485 456 497"/>
+    <path d="M530 411 C506 432 515 452 534 462 C552 471 550 493 531 504"/>
+    <path d="M600 451 C578 466 579 488 598 500"/>
+  </g>
+</g>
+
+<!-- circuit network -->
+<g fill="none" stroke="url(#white)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" filter="url(#softGlow)">
+  <path d="M365 373 L405 373 L440 342 L472 342 L500 315"/>
+  <path d="M338 428 L380 428 L410 402 L450 402"/>
+  <path d="M410 486 L450 486 L482 458 L520 458 L550 430"/>
+  <path d="M455 535 L455 500 L490 470 L520 470 L560 505"/>
+  <path d="M560 315 L560 350 L590 375 L625 375"/>
+  <path d="M520 280 L520 315"/>
+  <path d="M615 420 L650 420 L670 398"/>
+  <path d="M625 470 L660 470"/>
+  <path d="M345 395 L315 395 L315 370"/>
+  <path d="M310 505 L280 535 L240 535"/>
+  <path d="M380 530 L340 560 L290 560"/>
+  <path d="M610 300 L640 270 L640 235"/>
+</g>
+
+<!-- circuit copper lines -->
+<g fill="none" stroke="#d99068" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M405 350 L405 325 L430 300"/><path d="M455 315 L455 280"/>
+  <path d="M505 380 L535 350 L535 320"/><path d="M575 390 L610 360"/>
+  <path d="M420 445 L390 470 L350 470"/><path d="M500 500 L535 525 L535 550"/>
+  <path d="M585 475 L620 500 L650 500"/>
+</g>
+
+<!-- nodes -->
+<g fill="#f7ffff" stroke="#dffcff" stroke-width="4" filter="url(#softGlow)">
+  <circle cx="500" cy="315" r="12"/><circle cx="440" cy="342" r="10"/><circle cx="380" cy="428" r="10"/>
+  <circle cx="450" cy="402" r="10"/><circle cx="520" cy="458" r="10"/><circle cx="550" cy="430" r="10"/>
+  <circle cx="560" cy="505" r="10"/><circle cx="625" cy="375" r="10"/><circle cx="670" cy="398" r="10"/>
+  <circle cx="280" cy="535" r="12"/><circle cx="290" cy="560" r="10"/><circle cx="640" cy="235" r="12"/>
+</g>
+<g fill="#e6a27b">
+  <circle cx="405" cy="325" r="11"/><circle cx="455" cy="280" r="11"/><circle cx="535" cy="320" r="11"/>
+  <circle cx="610" cy="360" r="11"/><circle cx="390" cy="470" r="11"/><circle cx="535" cy="550" r="11"/><circle cx="650" cy="500" r="11"/>
+</g>
+
+<!-- external signal traces -->
+<g fill="none" stroke="#cfffff" stroke-width="7" stroke-linecap="round">
+  <path d="M350 560 C315 570 300 595 260 595 L220 595"/>
+  <path d="M630 315 C665 295 670 265 700 250"/>
+  <path d="M650 430 C690 425 710 405 740 405"/>
+</g>
+<g fill="#fff" filter="url(#softGlow)"><circle cx="220" cy="595" r="13"/><circle cx="700" cy="250" r="13"/><circle cx="740" cy="405" r="13"/></g>
+
+<!-- brand -->
+<text x="500" y="910" text-anchor="middle" font-family="Noto Sans, DejaVu Sans, Arial, sans-serif" font-size="112" font-weight="500" letter-spacing="-3" fill="#f5f8fa">Noviark</text>
+</svg>

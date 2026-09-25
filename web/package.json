@@ -1,0 +1,9 @@
+{
+  "name": "noviark-web",
+  "private": true,
+  "type": "module",
+  "description": "Web de Noviark Labs (Netlify)",
+  "dependencies": {
+    "@netlify/blobs": "^11.1.1"
+  }
+}
